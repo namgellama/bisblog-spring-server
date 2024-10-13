@@ -1,4 +1,4 @@
-package com.bisblog.bisblog.respositories;
+package com.bisblog.bisblog.repositories;
 
 import com.bisblog.bisblog.entities.Post;
 import org.springframework.data.jpa.repository.JpaRepository;

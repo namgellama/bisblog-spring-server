@@ -2,7 +2,7 @@ package com.bisblog.bisblog.services.impl;
 
 import com.bisblog.bisblog.dtos.PostDTO;
 import com.bisblog.bisblog.entities.Post;
-import com.bisblog.bisblog.respositories.PostRepository;
+import com.bisblog.bisblog.repositories.PostRepository;
 import com.bisblog.bisblog.services.PostService;
 import org.springframework.stereotype.Service;
 
