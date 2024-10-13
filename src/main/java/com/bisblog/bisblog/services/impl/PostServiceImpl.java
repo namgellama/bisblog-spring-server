@@ -2,6 +2,7 @@ package com.bisblog.bisblog.services.impl;
 
 import com.bisblog.bisblog.dtos.PostRequest;
 import com.bisblog.bisblog.entities.Post;
+import com.bisblog.bisblog.entities.User;
 import com.bisblog.bisblog.repositories.PostRepository;
 import com.bisblog.bisblog.services.PostService;
 import org.springframework.stereotype.Service;
@@ -30,10 +31,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post createPost(PostRequest post) {
+    public Post createPost(PostRequest post, User user) {
         Post newPost = new Post();
         newPost.setTitle(post.getTitle());
         newPost.setBody(post.getBody());
+        newPost.setAuthor(user);
 
         return postRepository.save(newPost);
     }

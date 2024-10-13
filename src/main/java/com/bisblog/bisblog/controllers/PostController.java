@@ -3,8 +3,11 @@ package com.bisblog.bisblog.controllers;
 import com.bisblog.bisblog.dtos.PostRequest;
 import com.bisblog.bisblog.entities.Post;
 import com.bisblog.bisblog.services.PostService;
+import com.bisblog.bisblog.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,9 +17,11 @@ import java.util.UUID;
 @RequestMapping("/api/posts")
 public class PostController {
     private final PostService postService;
+    private final UserService userService;
 
-    public PostController(PostService postService) {
+    public PostController(PostService postService, UserService userService) {
         this.postService = postService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -33,8 +38,9 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody PostRequest post) {
-        var newPost =  postService.createPost(post);
+    public ResponseEntity<Post> createPost(@RequestBody PostRequest post, @AuthenticationPrincipal UserDetails userDetails) {
+        var user = userService.findByEmail(userDetails.getUsername());
+        var newPost =  postService.createPost(post, user);
         return new ResponseEntity<>(newPost, HttpStatus.CREATED);
     }
 
