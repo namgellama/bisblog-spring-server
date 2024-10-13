@@ -7,6 +7,8 @@ import com.bisblog.bisblog.services.PostService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -19,6 +21,11 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> getAllPosts() {
         return postRepository.findAll();
+    }
+
+    @Override
+    public Optional<Post> getPostById(UUID id) {
+        return postRepository.findById(id);
     }
 
     @Override
