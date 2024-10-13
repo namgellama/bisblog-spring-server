@@ -1,8 +1,7 @@
 package com.bisblog.bisblog.controllers;
 
-import com.bisblog.bisblog.dtos.PostDTO;
+import com.bisblog.bisblog.dtos.PostRequest;
 import com.bisblog.bisblog.entities.Post;
-import com.bisblog.bisblog.exceptions.PostNotFoundException;
 import com.bisblog.bisblog.services.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,13 +33,13 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody PostDTO post) {
+    public ResponseEntity<Post> createPost(@RequestBody PostRequest post) {
         var newPost =  postService.createPost(post);
         return new ResponseEntity<>(newPost, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePost(@PathVariable UUID id, @RequestBody PostDTO post) {
+    public ResponseEntity<Post> updatePost(@PathVariable UUID id, @RequestBody PostRequest post) {
         var existingPost = postService.getPostById(id);
 
         if (existingPost.isEmpty())

@@ -1,6 +1,6 @@
 package com.bisblog.bisblog.services.impl;
 
-import com.bisblog.bisblog.dtos.PostDTO;
+import com.bisblog.bisblog.dtos.PostRequest;
 import com.bisblog.bisblog.entities.Post;
 import com.bisblog.bisblog.repositories.PostRepository;
 import com.bisblog.bisblog.services.PostService;
@@ -30,7 +30,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post createPost(PostDTO post) {
+    public Post createPost(PostRequest post) {
         Post newPost = new Post();
         newPost.setTitle(post.getTitle());
         newPost.setBody(post.getBody());
@@ -39,7 +39,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post updatePost(UUID id, PostDTO post) {
+    public Post updatePost(UUID id, PostRequest post) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Post not found with ID: " + id));
 

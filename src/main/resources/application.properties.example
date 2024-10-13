@@ -9,3 +9,5 @@ spring.datasource.driver-class-name=<database-driver-name>
 
 spring.jpa.show-sql=true
 spring.jpa.hibernate.ddl-auto=update
+
+app.security.secretKey=<secretKey>
