@@ -12,4 +12,5 @@ public interface PostService {
     Optional<Post> getPostById(UUID id);
     Post createPost(PostDTO post);
     Post updatePost(UUID id, PostDTO post);
+    boolean deletePost(UUID id);
 }

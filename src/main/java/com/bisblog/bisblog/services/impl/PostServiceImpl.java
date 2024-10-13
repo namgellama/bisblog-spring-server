@@ -48,4 +48,15 @@ public class PostServiceImpl implements PostService {
 
         return postRepository.save(existingPost);
     }
+
+    @Override
+    public boolean deletePost(UUID id) {
+        boolean isPresent = postRepository.existsById(id);
+
+        if (!isPresent)
+            return false;
+
+        postRepository.deleteById(id);
+        return true;
+    }
 }
