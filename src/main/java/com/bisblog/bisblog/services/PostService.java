@@ -11,5 +11,5 @@ public interface PostService {
     List<Post> getAllPosts();
     Optional<Post> getPostById(UUID id);
     Post createPost(PostDTO post);
-
+    Post updatePost(UUID id, PostDTO post);
 }

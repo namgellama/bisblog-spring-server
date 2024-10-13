@@ -7,6 +7,7 @@ import com.bisblog.bisblog.services.PostService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,5 +36,16 @@ public class PostServiceImpl implements PostService {
         newPost.setBody(post.getBody());
 
         return postRepository.save(newPost);
+    }
+
+    @Override
+    public Post updatePost(UUID id, PostDTO post) {
+        Post existingPost = postRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Post not found with ID: " + id));
+
+        existingPost.setTitle(post.getTitle());
+        existingPost.setBody(post.getBody());
+
+        return postRepository.save(existingPost);
     }
 }
