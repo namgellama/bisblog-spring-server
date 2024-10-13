@@ -1,6 +1,6 @@
 package com.bisblog.bisblog.services;
 
-import com.bisblog.bisblog.dtos.PostDTO;
+import com.bisblog.bisblog.dtos.PostRequest;
 import com.bisblog.bisblog.entities.Post;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface PostService {
     List<Post> getAllPosts();
     Optional<Post> getPostById(UUID id);
-    Post createPost(PostDTO post);
-    Post updatePost(UUID id, PostDTO post);
+    Post createPost(PostRequest post);
+    Post updatePost(UUID id, PostRequest post);
     boolean deletePost(UUID id);
 }

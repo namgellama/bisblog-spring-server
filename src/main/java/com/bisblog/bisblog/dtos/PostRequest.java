@@ -9,7 +9,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostDTO {
+public class PostRequest {
     private UUID id;
     private String title;
     private String body;
