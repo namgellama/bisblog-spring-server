@@ -1,3 +1,11 @@
 server.port=8000
 
 spring.application.name=bisblog
+
+spring.datasource.url=jdbc:<database>://<host>:<port>/<database-name>
+spring.datasource.username=<username>
+spring.datasource.password=<password>
+spring.datasource.driver-class-name=<database-driver-name>
+
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=update
