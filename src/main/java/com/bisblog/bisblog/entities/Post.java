@@ -20,4 +20,8 @@ public class Post {
 
     @Lob
     private String body;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User author;
 }
