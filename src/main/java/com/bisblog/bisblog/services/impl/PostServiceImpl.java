@@ -40,8 +40,11 @@ public class PostServiceImpl implements PostService {
                    var posts =  modelMapper.map(postEntity, PostResponse.class);
                    long upvoteCount = upvoteRepository.countByPost_Id(postEntity.getId());
                    long downVoteCount = downvoteRepository.countByPostId(postEntity.getId());
-                   posts.setUpvotesCount(upvoteCount);
-                   posts.setDownvotesCount(downVoteCount);
+                   long voteCount = upvoteCount - downVoteCount;
+
+                   posts.setUpvoteCount(upvoteCount);
+                   posts.setDownvoteCount(downVoteCount);
+                   posts.setVoteCount(voteCount);
                    return posts;
                 })
                  .collect(Collectors.toList());
@@ -53,9 +56,12 @@ public class PostServiceImpl implements PostService {
                 .map(postEntity -> {
                     var post = modelMapper.map(postEntity, PostResponse.class);
                     long upvoteCount = upvoteRepository.countByPost_Id(postEntity.getId());
-                    long downVoteCount = downvoteRepository.countByPostId(postEntity.getId());
-                    post.setUpvotesCount(upvoteCount);
-                    post.setDownvotesCount(downVoteCount);
+                    long downvoteCount = downvoteRepository.countByPostId(postEntity.getId());
+                    long voteCount = upvoteCount - downvoteCount;
+
+                    post.setUpvoteCount(upvoteCount);
+                    post.setDownvoteCount(downvoteCount);
+                    post.setVoteCount(voteCount);
                     return post;
                 });
     }

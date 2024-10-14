@@ -16,6 +16,7 @@ public class PostResponse {
     private String title;
     private String body;
     private AuthorResponse author;
-    private long upvotesCount;
-    private long downvotesCount;
+    private long upvoteCount;
+    private long downvoteCount;
+    private long voteCount;
 }
