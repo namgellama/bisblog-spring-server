@@ -9,4 +9,5 @@ import java.util.UUID;
 @Repository
 public interface UpvoteRepository extends JpaRepository<Upvote, UUID> {
     Upvote findByPost_IdAndUser_Id(UUID postId, UUID userId);
+    long countByPost_Id(UUID postId);
 }

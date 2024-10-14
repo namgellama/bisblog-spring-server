@@ -1,12 +1,12 @@
 package com.bisblog.bisblog.services.impl;
 
-import com.bisblog.bisblog.dtos.AuthorResponse;
 import com.bisblog.bisblog.dtos.PostRequest;
 import com.bisblog.bisblog.dtos.PostResponse;
 import com.bisblog.bisblog.entities.Post;
 import com.bisblog.bisblog.entities.User;
 import com.bisblog.bisblog.exceptions.UnauthorizedException;
 import com.bisblog.bisblog.repositories.PostRepository;
+import com.bisblog.bisblog.repositories.UpvoteRepository;
 import com.bisblog.bisblog.services.PostService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -21,24 +21,36 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
+    private final UpvoteRepository upvoteRepository;
 
-    public PostServiceImpl(PostRepository postRepository, ModelMapper modelMapper) {
+    public PostServiceImpl(PostRepository postRepository, ModelMapper modelMapper, UpvoteRepository upvoteRepository) {
         this.postRepository = postRepository;
         this.modelMapper = modelMapper;
+        this.upvoteRepository = upvoteRepository;
     }
 
     @Override
     public List<PostResponse> getAllPosts() {
          return postRepository.findAll()
                 .stream()
-                .map(postEntity -> modelMapper.map(postEntity, PostResponse.class))
+                .map(postEntity -> {
+                   var posts =  modelMapper.map(postEntity, PostResponse.class);
+                   long upvoteCount = upvoteRepository.countByPost_Id(postEntity.getId());
+                   posts.setUpvotesCount(upvoteCount);
+                   return posts;
+                })
                  .collect(Collectors.toList());
     }
 
     @Override
     public Optional<PostResponse> getPostById(UUID id) {
         return postRepository.findById(id)
-                .map(postEntity -> modelMapper.map(postEntity, PostResponse.class));
+                .map(postEntity -> {
+                    var post = modelMapper.map(postEntity, PostResponse.class);
+                    long upvoteCount = upvoteRepository.countByPost_Id(postEntity.getId());
+                    post.setUpvotesCount(upvoteCount);
+                    return post;
+                });
     }
 
     @Override
