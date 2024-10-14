@@ -59,15 +59,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentResponse createCommentReply(UUID postId, UUID commentId, CommentRequest comment, User user) throws MethodNotAllowedException {
-        var post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Post not found."));
-        var commentEntity = commentRepository.findById(commentId)
+    public CommentResponse createCommentReply(UUID postId, UUID commentId, CommentRequest comment, User user)  {
+        var commentEntity = commentRepository.findByIdAndPostId(commentId, postId)
                 .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
+        var post = postRepository.findById(postId).get();
 
-        if (!commentEntity.getPost().getId().equals(post.getId())) {
-            throw new PostNotFoundException("Post not found.");
-        }
 
         if (commentEntity.getParentComment() != null) {
             throw new NestedCommentException("Deep nested comment is not allowed");
@@ -85,11 +81,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentResponse> getAllRepliesByCommentId(UUID postId, UUID commentId) {
-        var commentEntity = commentRepository.findByIdAndPostId(commentId, postId);
+        commentRepository.findByIdAndPostId(commentId, postId)
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
 
-        if (commentEntity.isEmpty()) {
-            throw new PostNotFoundException("Post not found.");
-        }
 
         return commentRepository.findByParentCommentId(commentId)
                 .stream()
