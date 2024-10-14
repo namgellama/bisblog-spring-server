@@ -27,7 +27,7 @@ public class DownvoteServiceImpl implements DownvoteService {
     public Downvote downvote(UUID postId, User user) {
         var post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
-        var existingDownvote = downvoteRepository.findByPost_IdAndUser_Id(postId, user.getId());
+        var existingDownvote = downvoteRepository.findByPostIdAndUserId(postId, user.getId());
         var existingUpvote = upvoteRepository.findByPost_IdAndUser_Id(postId, user.getId());
 
         if (existingDownvote != null) {

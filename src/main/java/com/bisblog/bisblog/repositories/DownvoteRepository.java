@@ -9,6 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface DownvoteRepository extends JpaRepository<Downvote, UUID> {
-    Downvote findByPost_IdAndUser_Id(UUID postId, UUID userId);
-    long countByPost_Id(UUID postId);
+    Downvote findByPostIdAndUserId(UUID postId, UUID userId);
+    long countByPostId(UUID postId);
 }

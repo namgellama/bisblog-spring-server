@@ -11,11 +11,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PostResponse {
+public class DownvoteResponse {
     private UUID id;
-    private String title;
-    private String body;
-    private AuthorResponse author;
-    private long upvotesCount;
-    private long downvotesCount;
+    private UUID postId;
+    private UUID userId;
 }

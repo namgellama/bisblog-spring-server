@@ -28,7 +28,7 @@ public class UpvoteServiceImpl implements UpvoteService {
         var post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
         var existingUpvote = upvoteRepository.findByPost_IdAndUser_Id(postId, user.getId());
-        var existingDownvote = downvoteRepository.findByPost_IdAndUser_Id(postId, user.getId());
+        var existingDownvote = downvoteRepository.findByPostIdAndUserId(postId, user.getId());
 
         if (existingUpvote != null) {
             upvoteRepository.deleteById(existingUpvote.getId());

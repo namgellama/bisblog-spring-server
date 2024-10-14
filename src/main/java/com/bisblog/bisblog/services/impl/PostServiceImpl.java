@@ -5,6 +5,7 @@ import com.bisblog.bisblog.dtos.PostResponse;
 import com.bisblog.bisblog.entities.Post;
 import com.bisblog.bisblog.entities.User;
 import com.bisblog.bisblog.exceptions.UnauthorizedException;
+import com.bisblog.bisblog.repositories.DownvoteRepository;
 import com.bisblog.bisblog.repositories.PostRepository;
 import com.bisblog.bisblog.repositories.UpvoteRepository;
 import com.bisblog.bisblog.services.PostService;
@@ -22,11 +23,13 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
     private final UpvoteRepository upvoteRepository;
+    private final DownvoteRepository downvoteRepository;
 
-    public PostServiceImpl(PostRepository postRepository, ModelMapper modelMapper, UpvoteRepository upvoteRepository) {
+    public PostServiceImpl(PostRepository postRepository, ModelMapper modelMapper, UpvoteRepository upvoteRepository, DownvoteRepository downvoteRepository) {
         this.postRepository = postRepository;
         this.modelMapper = modelMapper;
         this.upvoteRepository = upvoteRepository;
+        this.downvoteRepository = downvoteRepository;
     }
 
     @Override
@@ -36,7 +39,9 @@ public class PostServiceImpl implements PostService {
                 .map(postEntity -> {
                    var posts =  modelMapper.map(postEntity, PostResponse.class);
                    long upvoteCount = upvoteRepository.countByPost_Id(postEntity.getId());
+                   long downVoteCount = downvoteRepository.countByPostId(postEntity.getId());
                    posts.setUpvotesCount(upvoteCount);
+                   posts.setDownvotesCount(downVoteCount);
                    return posts;
                 })
                  .collect(Collectors.toList());
@@ -48,7 +53,9 @@ public class PostServiceImpl implements PostService {
                 .map(postEntity -> {
                     var post = modelMapper.map(postEntity, PostResponse.class);
                     long upvoteCount = upvoteRepository.countByPost_Id(postEntity.getId());
+                    long downVoteCount = downvoteRepository.countByPostId(postEntity.getId());
                     post.setUpvotesCount(upvoteCount);
+                    post.setDownvotesCount(downVoteCount);
                     return post;
                 });
     }
