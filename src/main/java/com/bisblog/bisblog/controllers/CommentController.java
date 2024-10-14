@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,6 +21,11 @@ public class CommentController {
     public CommentController(CommentService commentService, UserService userService) {
         this.commentService = commentService;
         this.userService = userService;
+    }
+
+    @GetMapping
+    public List<CommentResponse> getALlComments(@PathVariable UUID postId) {
+        return commentService.getAllComments(postId);
     }
 
     @PostMapping

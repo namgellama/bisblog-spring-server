@@ -11,10 +11,13 @@ import com.bisblog.bisblog.repositories.CommentRepository;
 import com.bisblog.bisblog.repositories.PostRepository;
 import com.bisblog.bisblog.services.CommentService;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.MethodNotAllowedException;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -26,6 +29,19 @@ public class CommentServiceImpl implements CommentService {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.modelMapper = modelMapper;
+    }
+
+    @Override
+    public List<CommentResponse> getAllComments(UUID postId) {
+        boolean exists = postRepository.existsById(postId);
+
+        if (!exists)
+            throw new PostNotFoundException("Post not found.");
+
+        return commentRepository.findByPostId(postId)
+                .stream()
+                .map((commentEntity) -> modelMapper.map(commentEntity, CommentResponse.class))
+                .collect(Collectors.toList());
     }
 
     @Override

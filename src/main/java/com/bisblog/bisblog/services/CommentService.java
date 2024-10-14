@@ -6,10 +6,11 @@ import com.bisblog.bisblog.entities.Comment;
 import com.bisblog.bisblog.entities.User;
 import org.springframework.web.server.MethodNotAllowedException;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface CommentService {
+    List<CommentResponse> getAllComments(UUID postId);
     CommentResponse createComment(UUID postId, CommentRequest comment, User user);
-
     CommentResponse createCommentReply(UUID postId, UUID commentId, CommentRequest comment, User user) throws MethodNotAllowedException;
 }
