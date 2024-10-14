@@ -5,6 +5,7 @@ import com.bisblog.bisblog.dtos.PostResponse;
 import com.bisblog.bisblog.entities.Post;
 import com.bisblog.bisblog.entities.User;
 import com.bisblog.bisblog.exceptions.UnauthorizedException;
+import com.bisblog.bisblog.repositories.DownvoteRepository;
 import com.bisblog.bisblog.repositories.PostRepository;
 import com.bisblog.bisblog.repositories.UpvoteRepository;
 import com.bisblog.bisblog.services.PostService;
@@ -22,11 +23,13 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
     private final UpvoteRepository upvoteRepository;
+    private final DownvoteRepository downvoteRepository;
 
-    public PostServiceImpl(PostRepository postRepository, ModelMapper modelMapper, UpvoteRepository upvoteRepository) {
+    public PostServiceImpl(PostRepository postRepository, ModelMapper modelMapper, UpvoteRepository upvoteRepository, DownvoteRepository downvoteRepository) {
         this.postRepository = postRepository;
         this.modelMapper = modelMapper;
         this.upvoteRepository = upvoteRepository;
+        this.downvoteRepository = downvoteRepository;
     }
 
     @Override
@@ -36,7 +39,12 @@ public class PostServiceImpl implements PostService {
                 .map(postEntity -> {
                    var posts =  modelMapper.map(postEntity, PostResponse.class);
                    long upvoteCount = upvoteRepository.countByPost_Id(postEntity.getId());
-                   posts.setUpvotesCount(upvoteCount);
+                   long downVoteCount = downvoteRepository.countByPostId(postEntity.getId());
+                   long voteCount = upvoteCount - downVoteCount;
+
+                   posts.setUpvoteCount(upvoteCount);
+                   posts.setDownvoteCount(downVoteCount);
+                   posts.setVoteCount(voteCount);
                    return posts;
                 })
                  .collect(Collectors.toList());
@@ -48,7 +56,12 @@ public class PostServiceImpl implements PostService {
                 .map(postEntity -> {
                     var post = modelMapper.map(postEntity, PostResponse.class);
                     long upvoteCount = upvoteRepository.countByPost_Id(postEntity.getId());
-                    post.setUpvotesCount(upvoteCount);
+                    long downvoteCount = downvoteRepository.countByPostId(postEntity.getId());
+                    long voteCount = upvoteCount - downvoteCount;
+
+                    post.setUpvoteCount(upvoteCount);
+                    post.setDownvoteCount(downvoteCount);
+                    post.setVoteCount(voteCount);
                     return post;
                 });
     }
