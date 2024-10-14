@@ -9,4 +9,6 @@ import java.util.UUID;
 
 public interface CommentService {
     CommentResponse createComment(UUID postId, CommentRequest comment, User user);
+
+    CommentResponse createCommentReply(UUID postId, UUID commentId, CommentRequest comment, User user);
 }

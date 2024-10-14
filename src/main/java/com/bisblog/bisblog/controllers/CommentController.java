@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/api/posts/{postId}/comments")
 public class CommentController {
     private final CommentService commentService;
     private final UserService userService;
@@ -21,10 +22,16 @@ public class CommentController {
         this.userService = userService;
     }
 
-    @PostMapping("/api/posts/{postId}/comments")
+    @PostMapping
     public CommentResponse createComment(@PathVariable UUID postId, @RequestBody CommentRequest comment, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
 
         return commentService.createComment(postId, comment, user);
+    }
+    @PostMapping("/{commentId}/replies")
+    public CommentResponse createCommentReply(@PathVariable UUID postId, @PathVariable UUID commentId, @RequestBody CommentRequest comment, @AuthenticationPrincipal UserDetails userDetails) {
+        var user = userService.findByEmail(userDetails.getUsername());
+
+        return commentService.createCommentReply(postId, commentId, comment, user);
     }
 }
