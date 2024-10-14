@@ -13,4 +13,5 @@ public interface CommentService {
     List<CommentResponse> getAllComments(UUID postId);
     CommentResponse createComment(UUID postId, CommentRequest comment, User user);
     CommentResponse createCommentReply(UUID postId, UUID commentId, CommentRequest comment, User user) throws MethodNotAllowedException;
+    List<CommentResponse> getAllRepliesByCommentId(UUID postId, UUID commentId);
 }

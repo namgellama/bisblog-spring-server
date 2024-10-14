@@ -34,6 +34,13 @@ public class CommentController {
 
         return commentService.createComment(postId, comment, user);
     }
+
+    @GetMapping("/{commentId}/replies")
+    public List<CommentResponse> getAllRepliesByCommentId(@PathVariable UUID postId, @PathVariable UUID commentId) {
+        return commentService.getAllRepliesByCommentId(postId, commentId);
+    }
+
+
     @PostMapping("/{commentId}/replies")
     public CommentResponse createCommentReply(@PathVariable UUID postId, @PathVariable UUID commentId, @RequestBody CommentRequest comment, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());

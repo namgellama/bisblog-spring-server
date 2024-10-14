@@ -82,4 +82,21 @@ public class CommentServiceImpl implements CommentService {
 
         return modelMapper.map(commentRepository.save(newComment), CommentResponse.class);
     }
+
+    @Override
+    public List<CommentResponse> getAllRepliesByCommentId(UUID postId, UUID commentId) {
+        var post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found."));
+        var commentEntity = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
+
+        if (!commentEntity.getPost().getId().equals(post.getId())) {
+            throw new PostNotFoundException("Post not found.");
+        }
+
+        return commentRepository.findByParentCommentId(commentId)
+                .stream()
+                .map(comment -> modelMapper.map(comment, CommentResponse.class))
+                .collect(Collectors.toList());
+    }
 }
