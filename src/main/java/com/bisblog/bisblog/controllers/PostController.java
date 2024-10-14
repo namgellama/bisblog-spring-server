@@ -1,6 +1,7 @@
 package com.bisblog.bisblog.controllers;
 
 import com.bisblog.bisblog.dtos.PostRequest;
+import com.bisblog.bisblog.dtos.PostResponse;
 import com.bisblog.bisblog.entities.Post;
 import com.bisblog.bisblog.services.PostService;
 import com.bisblog.bisblog.services.UserService;
@@ -25,12 +26,12 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Post>> getAllPosts() {
+    public ResponseEntity<List<PostResponse>> getAllPosts() {
         return new ResponseEntity<>(postService.getAllPosts(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getPostById(@PathVariable UUID id) {
+    public ResponseEntity<PostResponse> getPostById(@PathVariable UUID id) {
         var post = postService.getPostById(id);
         return post.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
@@ -38,26 +39,28 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody PostRequest post, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest post, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
         var newPost =  postService.createPost(post, user);
         return new ResponseEntity<>(newPost, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePost(@PathVariable UUID id, @RequestBody PostRequest post) {
+    public ResponseEntity<PostResponse> updatePost(@PathVariable UUID id, @RequestBody PostRequest post, @AuthenticationPrincipal UserDetails userDetails) {
         var existingPost = postService.getPostById(id);
+        var user = userService.findByEmail(userDetails.getUsername());
 
         if (existingPost.isEmpty())
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
-        var updatedPost = postService.updatePost(id, post);
+        var updatedPost = postService.updatePost(id, post, user);
         return new ResponseEntity<>(updatedPost, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable UUID id) {
-        boolean result = postService.deletePost(id);
+    public ResponseEntity<Void> deletePost(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {
+        var user = userService.findByEmail(userDetails.getUsername());
+        boolean result = postService.deletePost(id, user);
 
         if (!result)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
