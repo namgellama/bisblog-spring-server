@@ -38,4 +38,12 @@ public class Comment {
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Comment> replies;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Upvote> upvotes;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Downvote> downvotes;
 }
