@@ -85,12 +85,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentResponse> getAllRepliesByCommentId(UUID postId, UUID commentId) {
-        var post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Post not found."));
-        var commentEntity = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
+        var commentEntity = commentRepository.findByIdAndPostId(commentId, postId);
 
-        if (!commentEntity.getPost().getId().equals(post.getId())) {
+        if (commentEntity.isEmpty()) {
             throw new PostNotFoundException("Post not found.");
         }
 
