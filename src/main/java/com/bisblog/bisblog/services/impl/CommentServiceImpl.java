@@ -5,12 +5,14 @@ import com.bisblog.bisblog.dtos.CommentResponse;
 import com.bisblog.bisblog.entities.Comment;
 import com.bisblog.bisblog.entities.User;
 import com.bisblog.bisblog.exceptions.CommentNotFoundException;
+import com.bisblog.bisblog.exceptions.NestedCommentException;
 import com.bisblog.bisblog.exceptions.PostNotFoundException;
 import com.bisblog.bisblog.repositories.CommentRepository;
 import com.bisblog.bisblog.repositories.PostRepository;
 import com.bisblog.bisblog.services.CommentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.MethodNotAllowedException;
 
 import java.util.UUID;
 
@@ -41,11 +43,19 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentResponse createCommentReply(UUID postId, UUID commentId, CommentRequest comment, User user) {
+    public CommentResponse createCommentReply(UUID postId, UUID commentId, CommentRequest comment, User user) throws MethodNotAllowedException {
         var post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found."));
         var commentEntity = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
+
+        if (!commentEntity.getPost().getId().equals(post.getId())) {
+            throw new PostNotFoundException("Post not found.");
+        }
+
+        if (commentEntity.getParentComment() != null) {
+            throw new NestedCommentException("Deep nested comment is not allowed");
+        }
 
         var newComment = Comment.builder()
                 .description(comment.getDescription())
