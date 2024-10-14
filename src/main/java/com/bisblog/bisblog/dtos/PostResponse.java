@@ -19,4 +19,6 @@ public class PostResponse {
     private long upvoteCount;
     private long downvoteCount;
     private long voteCount;
+
+    private long commentCount;
 }
