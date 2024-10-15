@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "post_id"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "post_id", "comment_id"})})
 public class Upvote {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

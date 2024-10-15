@@ -41,7 +41,7 @@ public class PostServiceImpl implements PostService {
                 .stream()
                 .map(postEntity -> {
                    var posts =  modelMapper.map(postEntity, PostResponse.class);
-                   long upvoteCount = upvoteRepository.countByPost_Id(postEntity.getId());
+                   long upvoteCount = upvoteRepository.countByPostId(postEntity.getId());
                    long downVoteCount = downvoteRepository.countByPostId(postEntity.getId());
                    long voteCount = upvoteCount - downVoteCount;
                    long commentCount = commentRepository.countByPostId(postEntity.getId());
@@ -60,7 +60,7 @@ public class PostServiceImpl implements PostService {
         return postRepository.findById(id)
                 .map(postEntity -> {
                     var post = modelMapper.map(postEntity, PostResponse.class);
-                    long upvoteCount = upvoteRepository.countByPost_Id(postEntity.getId());
+                    long upvoteCount = upvoteRepository.countByPostId(postEntity.getId());
                     long downvoteCount = downvoteRepository.countByPostId(postEntity.getId());
                     long voteCount = upvoteCount - downvoteCount;
                     long commentCount = commentRepository.countByPostId(postEntity.getId());

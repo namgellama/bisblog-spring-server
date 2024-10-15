@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,13 +31,16 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @ToString.Exclude
     private List<Upvote> upvotes;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @ToString.Exclude
     private List<Downvote> downvotes;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @ToString.Exclude
     private List<Comment> comments;
 }

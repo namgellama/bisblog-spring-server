@@ -7,5 +7,6 @@ import com.bisblog.bisblog.entities.User;
 import java.util.UUID;
 
 public interface DownvoteService {
-    Downvote downvote(UUID postId, User user);
+    Downvote downvotePost(UUID postId, User user);
+    Downvote downvoteComment(UUID commentId, User user);
 }

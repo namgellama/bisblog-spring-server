@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/posts/{postId}/upvotes")
+@RequestMapping("/api")
 public class UpvoteController {
     private final UpvoteService upvoteService;
     private final UserService userService;
@@ -24,10 +24,18 @@ public class UpvoteController {
         this.modelMapper = modelMapper;
     }
 
-    @PostMapping
-    public UpvoteResponse createUpvote(@PathVariable UUID postId, @AuthenticationPrincipal UserDetails userDetails) {
+    @PostMapping("/posts/{postId}/upvotes")
+    public UpvoteResponse createPostUpvote(@PathVariable UUID postId, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
 
-        return modelMapper.map(upvoteService.upvote(postId, user), UpvoteResponse.class);
+        return modelMapper.map(upvoteService.upvotePost(postId, user), UpvoteResponse.class);
+    }
+
+    @PostMapping("/comments/{commentId}/upvotes")
+    public UpvoteResponse createCommentUpvote(@PathVariable UUID commentId, @AuthenticationPrincipal UserDetails userDetails) {
+        var user = userService.findByEmail(userDetails.getUsername());
+        System.out.println(userDetails.getUsername());
+
+        return modelMapper.map(upvoteService.upvoteComment(commentId, user), UpvoteResponse.class);
     }
 }
