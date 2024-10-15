@@ -81,10 +81,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentResponse createCommentReply(UUID postId, UUID commentId, CommentRequest comment, User user)  {
-        var commentEntity = commentRepository.findByIdAndPostId(commentId, postId)
+    public CommentResponse createCommentReply(UUID commentId, CommentRequest comment, User user)  {
+        var commentEntity = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
-        var post = postRepository.findById(postId).get();
+        var post = commentEntity.getPost();
 
 
         if (commentEntity.getParentComment() != null) {
@@ -102,8 +102,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentResponse> getAllRepliesByCommentId(UUID postId, UUID commentId) {
-        commentRepository.findByIdAndPostId(commentId, postId)
+    public List<CommentResponse> getAllRepliesByCommentId(UUID commentId) {
+        commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
 
 
@@ -111,5 +111,18 @@ public class CommentServiceImpl implements CommentService {
                 .stream()
                 .map(comment -> modelMapper.map(comment, CommentResponse.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean deleteComment(UUID commentId, User user) {
+        var comment = commentRepository.findById(commentId);
+
+
+        if (comment == null || comment.get().getUser().getId() != user.getId()) {
+            return false;
+        }
+
+        commentRepository.deleteById(commentId);
+        return true;
     }
 }
