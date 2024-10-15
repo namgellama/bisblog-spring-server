@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/posts/{postId}/downvotes")
+@RequestMapping("/api")
 public class DownvoteController {
     private final DownvoteService downvoteService;
     private final UserService userService;
@@ -26,10 +26,17 @@ public class DownvoteController {
         this.modelMapper = modelMapper;
     }
 
-    @PostMapping
-    public DownvoteResponse createDownvote(@PathVariable UUID postId, @AuthenticationPrincipal UserDetails userDetails) {
+    @PostMapping("/posts/{postId}/downvotes")
+    public DownvoteResponse createPostDownvote(@PathVariable UUID postId, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
 
-        return modelMapper.map(downvoteService.downvote(postId, user), DownvoteResponse.class);
+        return modelMapper.map(downvoteService.downvotePost(postId, user), DownvoteResponse.class);
+    }
+
+    @PostMapping("/comments/{commentId}/downvotes")
+    public DownvoteResponse createCommentDownvote(@PathVariable UUID commentId, @AuthenticationPrincipal UserDetails userDetails) {
+        var user = userService.findByEmail(userDetails.getUsername());
+
+        return modelMapper.map(downvoteService.downvoteComment(commentId, user), DownvoteResponse.class);
     }
 }

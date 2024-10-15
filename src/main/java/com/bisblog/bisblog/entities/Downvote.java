@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "post_id"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "post_id", "comment_id"})})
 public class Downvote {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -25,6 +25,10 @@ public class Downvote {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id")
     private Post post;
+
+    @ManyToOne
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
 }
