@@ -49,6 +49,13 @@ public class CommentController {
         return commentService.createCommentReply(commentId, comment, user);
     }
 
+    @PutMapping("/comments/{commentId}")
+    public ResponseEntity<CommentResponse> updateComment(@PathVariable UUID commentId, @RequestBody CommentRequest comment, @AuthenticationPrincipal UserDetails userDetails) {
+        var user = userService.findByEmail(userDetails.getUsername());
+        var response = commentService.updateComment(commentId, comment, user);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable UUID commentId, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());

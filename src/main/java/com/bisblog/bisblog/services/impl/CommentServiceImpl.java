@@ -7,6 +7,7 @@ import com.bisblog.bisblog.entities.User;
 import com.bisblog.bisblog.exceptions.CommentNotFoundException;
 import com.bisblog.bisblog.exceptions.NestedCommentException;
 import com.bisblog.bisblog.exceptions.PostNotFoundException;
+import com.bisblog.bisblog.exceptions.UnauthorizedException;
 import com.bisblog.bisblog.repositories.CommentRepository;
 import com.bisblog.bisblog.repositories.DownvoteRepository;
 import com.bisblog.bisblog.repositories.PostRepository;
@@ -111,6 +112,19 @@ public class CommentServiceImpl implements CommentService {
                 .stream()
                 .map(comment -> modelMapper.map(comment, CommentResponse.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public CommentResponse updateComment(UUID commentId, CommentRequest comment, User user) {
+        var commentEntity = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
+
+        if (commentEntity.getUser().getId() != user.getId()) {
+            throw new UnauthorizedException("Not allowed.");
+        }
+
+        commentEntity.setDescription(comment.getDescription());
+        return modelMapper.map(commentRepository.save(commentEntity), CommentResponse.class);
     }
 
     @Override
