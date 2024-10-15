@@ -11,4 +11,5 @@ public interface UpvoteRepository extends JpaRepository<Upvote, UUID> {
     Upvote findByPostIdAndUserId(UUID postId, UUID userId);
     Upvote findByCommentIdAndUserId(UUID commentId, UUID userId);
     long countByPostId(UUID postId);
+    long countByCommentId(UUID commentId);
 }

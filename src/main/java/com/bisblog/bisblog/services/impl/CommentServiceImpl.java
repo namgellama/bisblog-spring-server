@@ -8,12 +8,14 @@ import com.bisblog.bisblog.exceptions.CommentNotFoundException;
 import com.bisblog.bisblog.exceptions.NestedCommentException;
 import com.bisblog.bisblog.exceptions.PostNotFoundException;
 import com.bisblog.bisblog.repositories.CommentRepository;
+import com.bisblog.bisblog.repositories.DownvoteRepository;
 import com.bisblog.bisblog.repositories.PostRepository;
+import com.bisblog.bisblog.repositories.UpvoteRepository;
 import com.bisblog.bisblog.services.CommentService;
+import com.bisblog.bisblog.services.DownvoteService;
+import com.bisblog.bisblog.services.UpvoteService;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.MethodNotAllowedException;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,11 +25,21 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final UpvoteRepository upvoteRepository;
+    private final DownvoteRepository downvoteRepository;
     private final ModelMapper modelMapper;
 
-    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository, ModelMapper modelMapper) {
+    public CommentServiceImpl(
+            CommentRepository commentRepository,
+            PostRepository postRepository,
+            UpvoteRepository upvoteRepository,
+            DownvoteRepository downvoteRepository,
+            ModelMapper modelMapper
+    ) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
+        this.upvoteRepository = upvoteRepository;
+        this.downvoteRepository = downvoteRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -40,7 +52,17 @@ public class CommentServiceImpl implements CommentService {
 
         return commentRepository.findByPostId(postId)
                 .stream()
-                .map((commentEntity) -> modelMapper.map(commentEntity, CommentResponse.class))
+                .map((commentEntity) -> {
+                    var comments = modelMapper.map(commentEntity, CommentResponse.class);
+                    long upvoteCount = upvoteRepository.countByCommentId(commentEntity.getId());
+                    long downvoteCount = downvoteRepository.countByCommentId(commentEntity.getId());
+                    long voteCount = upvoteCount - downvoteCount;
+
+                    comments.setUpvoteCount(upvoteCount);
+                    comments.setDownvoteCount(downvoteCount);
+                    comments.setVoteCount(voteCount);
+                    return comments;
+                })
                 .collect(Collectors.toList());
     }
 

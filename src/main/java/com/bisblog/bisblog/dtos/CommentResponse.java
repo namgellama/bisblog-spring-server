@@ -17,4 +17,7 @@ public class CommentResponse {
     private UUID postId;
     private UUID userId;
     private UUID commentId;
+    private long upvoteCount;
+    private long downvoteCount;
+    private long voteCount;
 }

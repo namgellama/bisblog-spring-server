@@ -12,4 +12,5 @@ public interface DownvoteRepository extends JpaRepository<Downvote, UUID> {
     Downvote findByPostIdAndUserId(UUID postId, UUID userId);
     Downvote findByCommentIdAndUserId(UUID commentId, UUID userId);
     long countByPostId(UUID postId);
+    long countByCommentId(UUID postId);
 }
