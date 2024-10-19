@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
 
@@ -20,16 +20,23 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/users/current")
+    @GetMapping("/current")
     public RegisterResponse getUser(@AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
         return userService.getUser(user);
     }
 
-    @PostMapping("/admins")
+    @PostMapping()
     public RegisterResponse createAdmin(@RequestBody  RegisterRequest registerRequest, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
 
         return userService.createAdmin(registerRequest, user);
+    }
+
+    @PutMapping("/current")
+    public RegisterResponse updateUser(@RequestBody RegisterRequest registerRequest, @AuthenticationPrincipal UserDetails userDetails) {
+        var user = userService.findByEmail(userDetails.getUsername());
+
+        return userService.updateUser(registerRequest, user);
     }
 }

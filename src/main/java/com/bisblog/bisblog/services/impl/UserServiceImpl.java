@@ -55,4 +55,16 @@ public class UserServiceImpl implements UserService {
 
         return modelMapper.map(userEntity, RegisterResponse.class);
     }
+
+    @Override
+    public RegisterResponse updateUser(RegisterRequest registerRequest, User user) {
+        var userEntity = userRepository.findById(user.getId())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+
+        userEntity.setFirstName(registerRequest.getFirstName());
+        userEntity.setLastName(registerRequest.getLastName());
+        userEntity.setEmail(registerRequest.getEmail());
+
+        return modelMapper.map(userRepository.save(userEntity), RegisterResponse.class);
+    }
 }
