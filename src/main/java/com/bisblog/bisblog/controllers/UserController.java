@@ -4,6 +4,8 @@ import com.bisblog.bisblog.dtos.RegisterRequest;
 import com.bisblog.bisblog.dtos.RegisterResponse;
 import com.bisblog.bisblog.repositories.UserRepository;
 import com.bisblog.bisblog.services.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,5 +40,16 @@ public class UserController {
         var user = userService.findByEmail(userDetails.getUsername());
 
         return userService.updateUser(registerRequest, user);
+    }
+
+    @DeleteMapping("/current")
+    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
+        var user = userService.findByEmail(userDetails.getUsername());
+        var result =  userService.deleteUser(user);
+
+        if (result)
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

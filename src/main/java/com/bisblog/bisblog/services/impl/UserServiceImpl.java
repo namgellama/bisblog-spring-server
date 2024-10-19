@@ -67,4 +67,15 @@ public class UserServiceImpl implements UserService {
 
         return modelMapper.map(userRepository.save(userEntity), RegisterResponse.class);
     }
+
+    @Override
+    public boolean deleteUser(User user) {
+        var userEntity = userRepository.findById(user.getId());
+
+        if (userEntity == null)
+            return false;
+
+        userRepository.deleteById(userEntity.get().getId());
+        return true;
+    }
 }
