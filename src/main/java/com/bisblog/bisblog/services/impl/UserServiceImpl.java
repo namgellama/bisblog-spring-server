@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -44,5 +46,13 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         return modelMapper.map(userRepository.save(newAdmin), RegisterResponse.class);
+    }
+
+    @Override
+    public RegisterResponse getUser(User user) {
+        var userEntity = userRepository.findById(user.getId())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+
+        return modelMapper.map(userEntity, RegisterResponse.class);
     }
 }
