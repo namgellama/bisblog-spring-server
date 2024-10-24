@@ -8,10 +8,10 @@ import com.bisblog.bisblog.entities.User;
 import com.bisblog.bisblog.entities.enums.Role;
 import com.bisblog.bisblog.repositories.UserRepository;
 import com.bisblog.bisblog.services.AuthService;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,11 +20,13 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
+    private final ModelMapper modelMapper;
 
-    public AuthServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, JwtService jwtService) {
+    public AuthServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, JwtService jwtService, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -38,12 +40,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         var user = userRepository.save(userData);
 
-        return  RegisterResponse.builder()
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
+        return modelMapper.map(user, RegisterResponse.class);
     }
 
     @Override
