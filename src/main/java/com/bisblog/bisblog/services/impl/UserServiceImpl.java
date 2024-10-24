@@ -1,5 +1,6 @@
 package com.bisblog.bisblog.services.impl;
 
+import com.bisblog.bisblog.dtos.ChangePasswordRequest;
 import com.bisblog.bisblog.dtos.RegisterRequest;
 import com.bisblog.bisblog.dtos.RegisterResponse;
 import com.bisblog.bisblog.entities.User;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.UUID;
 
 @Service
@@ -77,5 +79,15 @@ public class UserServiceImpl implements UserService {
 
         userRepository.deleteById(userEntity.get().getId());
         return true;
+    }
+
+    @Override
+    public void changePassword(ChangePasswordRequest request, User user) {
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalStateException("Wrong Password.");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }
