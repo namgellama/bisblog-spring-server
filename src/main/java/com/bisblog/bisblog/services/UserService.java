@@ -4,6 +4,7 @@ import com.bisblog.bisblog.dtos.ChangePasswordRequest;
 import com.bisblog.bisblog.dtos.RegisterRequest;
 import com.bisblog.bisblog.dtos.RegisterResponse;
 import com.bisblog.bisblog.entities.User;
+import jakarta.mail.MessagingException;
 import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
@@ -19,4 +20,8 @@ public interface UserService {
     boolean deleteUser(User user);
 
     void changePassword(ChangePasswordRequest request, User user);
+
+    String forgotPassword(String email) throws MessagingException;
+
+    String resetPassword(String email, String newPassword);
 }
