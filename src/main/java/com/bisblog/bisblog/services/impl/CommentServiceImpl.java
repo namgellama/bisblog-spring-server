@@ -44,6 +44,7 @@ public class CommentServiceImpl implements CommentService {
         this.modelMapper = modelMapper;
     }
 
+    // Get all comments of a post
     @Override
     public List<CommentResponse> getAllComments(UUID postId) {
         boolean exists = postRepository.existsById(postId);
@@ -67,6 +68,7 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toList());
     }
 
+    // Create a comment
     @Override
     public CommentResponse createComment(UUID postId, CommentRequest comment, User user) {
         var post = postRepository.findById(postId)
@@ -81,15 +83,27 @@ public class CommentServiceImpl implements CommentService {
         return modelMapper.map(commentRepository.save(newComment), CommentResponse.class);
     }
 
+    // Get all replies of a comment
+    @Override
+    public List<CommentResponse> getAllRepliesByCommentId(UUID commentId) {
+        commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
+
+        return commentRepository.findByParentCommentId(commentId)
+                .stream()
+                .map(comment -> modelMapper.map(comment, CommentResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    // Create a reply of a comment
     @Override
     public CommentResponse createCommentReply(UUID commentId, CommentRequest comment, User user)  {
         var commentEntity = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
         var post = commentEntity.getPost();
 
-
         if (commentEntity.getParentComment() != null) {
-            throw new NestedCommentException("Deep nested comment is not allowed");
+            throw new NestedCommentException("Deep nested comment is not allowed.");
         }
 
         var newComment = Comment.builder()
@@ -102,18 +116,7 @@ public class CommentServiceImpl implements CommentService {
         return modelMapper.map(commentRepository.save(newComment), CommentResponse.class);
     }
 
-    @Override
-    public List<CommentResponse> getAllRepliesByCommentId(UUID commentId) {
-        commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
-
-
-        return commentRepository.findByParentCommentId(commentId)
-                .stream()
-                .map(comment -> modelMapper.map(comment, CommentResponse.class))
-                .collect(Collectors.toList());
-    }
-
+    // Update a comment
     @Override
     public CommentResponse updateComment(UUID commentId, CommentRequest comment, User user) {
         var commentEntity = commentRepository.findById(commentId)
@@ -127,16 +130,16 @@ public class CommentServiceImpl implements CommentService {
         return modelMapper.map(commentRepository.save(commentEntity), CommentResponse.class);
     }
 
+    // Delete a comment
     @Override
-    public boolean deleteComment(UUID commentId, User user) {
-        var comment = commentRepository.findById(commentId);
+    public void deleteComment(UUID commentId, User user) {
+        var comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
 
-
-        if (comment == null || comment.get().getUser().getId() != user.getId()) {
-            return false;
+        if (comment.getUser().getId() != user.getId()) {
+            throw new UnauthorizedException("Not allowed.");
         }
 
         commentRepository.deleteById(commentId);
-        return true;
     }
 }
