@@ -4,6 +4,7 @@ import com.bisblog.bisblog.dtos.PostRequest;
 import com.bisblog.bisblog.dtos.PostResponse;
 import com.bisblog.bisblog.entities.Post;
 import com.bisblog.bisblog.entities.User;
+import com.bisblog.bisblog.exceptions.PostNotFoundException;
 import com.bisblog.bisblog.exceptions.UnauthorizedException;
 import com.bisblog.bisblog.repositories.CommentRepository;
 import com.bisblog.bisblog.repositories.DownvoteRepository;
@@ -83,7 +84,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostResponse updatePost(UUID id, PostRequest post, User user) {
         Post existingPost = postRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Post not found."));
+                .orElseThrow(() -> new PostNotFoundException("Post not found."));
 
         if (!existingPost.getAuthor().getId().equals(user.getId())) {
             throw new UnauthorizedException("Not authorized.");
