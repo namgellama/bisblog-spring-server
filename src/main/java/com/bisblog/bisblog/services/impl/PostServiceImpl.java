@@ -4,6 +4,7 @@ import com.bisblog.bisblog.dtos.PostRequest;
 import com.bisblog.bisblog.dtos.PostResponse;
 import com.bisblog.bisblog.entities.Post;
 import com.bisblog.bisblog.entities.User;
+import com.bisblog.bisblog.exceptions.PostNotFoundException;
 import com.bisblog.bisblog.exceptions.UnauthorizedException;
 import com.bisblog.bisblog.repositories.CommentRepository;
 import com.bisblog.bisblog.repositories.DownvoteRepository;
@@ -35,6 +36,7 @@ public class PostServiceImpl implements PostService {
         this.commentRepository = commentRepository;
     }
 
+    // Get all posts
     @Override
     public List<PostResponse> getAllPosts() {
          return postRepository.findAll()
@@ -55,6 +57,7 @@ public class PostServiceImpl implements PostService {
                  .collect(Collectors.toList());
     }
 
+    // Get a single post
     @Override
     public Optional<PostResponse> getPostById(UUID id) {
         return postRepository.findById(id)
@@ -73,6 +76,7 @@ public class PostServiceImpl implements PostService {
                 });
     }
 
+    // Create a post
     @Override
     public PostResponse createPost(PostRequest post, User user) {
         Post postEntity = modelMapper.map(post, Post.class);
@@ -80,10 +84,11 @@ public class PostServiceImpl implements PostService {
         return modelMapper.map(postRepository.save(postEntity), PostResponse.class);
     }
 
+    // Update a post
     @Override
     public PostResponse updatePost(UUID id, PostRequest post, User user) {
         Post existingPost = postRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Post not found."));
+                .orElseThrow(() -> new PostNotFoundException("Post not found."));
 
         if (!existingPost.getAuthor().getId().equals(user.getId())) {
             throw new UnauthorizedException("Not authorized.");
@@ -95,6 +100,7 @@ public class PostServiceImpl implements PostService {
         return modelMapper.map(postRepository.save(existingPost), PostResponse.class);
     }
 
+    // Delete a post
     @Override
     public boolean deletePost(UUID id, User user) {
         var existingPost = postRepository.findById(id);

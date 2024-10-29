@@ -5,7 +5,9 @@ import com.bisblog.bisblog.dtos.RegisterRequest;
 import com.bisblog.bisblog.dtos.RegisterResponse;
 import com.bisblog.bisblog.entities.User;
 import com.bisblog.bisblog.entities.enums.Role;
+import com.bisblog.bisblog.exceptions.ForbiddenException;
 import com.bisblog.bisblog.exceptions.UnauthorizedException;
+import com.bisblog.bisblog.exceptions.UserNotFoundException;
 import com.bisblog.bisblog.repositories.UserRepository;
 import com.bisblog.bisblog.services.UserService;
 import com.bisblog.bisblog.utils.EmailUtil;
@@ -14,6 +16,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,15 +33,23 @@ public class UserServiceImpl implements UserService {
         this.emailUtil = emailUtil;
     }
 
+    // Find user by email
     @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found."));
     }
 
+    // Create another admin
     @Override
     public RegisterResponse createAdmin(RegisterRequest registerRequest, User user) {
         if (user.getRole() != Role.ADMIN) {
-            throw new UnauthorizedException("Not authorized");
+            throw new UnauthorizedException("Not authorized.");
+        }
+
+        var existingUser = userRepository.findByEmail(registerRequest.getEmail());
+
+        if (existingUser.isPresent()) {
+            throw new ForbiddenException("User already exists.");
         }
 
         var newAdmin = User.builder()
@@ -51,6 +63,7 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(userRepository.save(newAdmin), RegisterResponse.class);
     }
 
+    // Get a user
     @Override
     public RegisterResponse getUser(User user) {
         var userEntity = userRepository.findById(user.getId())
@@ -59,10 +72,17 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(userEntity, RegisterResponse.class);
     }
 
+    // Update a user
     @Override
     public RegisterResponse updateUser(RegisterRequest registerRequest, User user) {
         var userEntity = userRepository.findById(user.getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+
+        var existingUser = userRepository.findByEmail(registerRequest.getEmail());
+
+        if (existingUser.isPresent() && existingUser.get().getId() != user.getId()) {
+            throw new ForbiddenException("User already exists.");
+        }
 
         userEntity.setFirstName(registerRequest.getFirstName());
         userEntity.setLastName(registerRequest.getLastName());
@@ -71,17 +91,18 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(userRepository.save(userEntity), RegisterResponse.class);
     }
 
+    // Delete a user
     @Override
-    public boolean deleteUser(User user) {
+    public void deleteUser(User user) {
         var userEntity = userRepository.findById(user.getId());
 
         if (userEntity == null)
-            return false;
+            throw new UsernameNotFoundException("User not found.");
 
         userRepository.deleteById(userEntity.get().getId());
-        return true;
     }
 
+    // Change password
     @Override
     public void changePassword(ChangePasswordRequest request, User user) {
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
@@ -92,9 +113,10 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    // Forgot password
     @Override
     public String forgotPassword(String email)  {
-        userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found."));
+        userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found."));
 
         try {
             emailUtil.sendResetPasswordEmail(email);
@@ -105,12 +127,13 @@ public class UserServiceImpl implements UserService {
         return "Please check your email to reset your password";
     }
 
+    // Reset password
     @Override
     public String resetPassword(String email, String newPassword) {
         var user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found."));
-
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+
         return "New password set successfully.";
     }
 }

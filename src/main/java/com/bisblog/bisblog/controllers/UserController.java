@@ -25,51 +25,71 @@ public class UserController {
         this.userService = userService;
     }
 
+    // @desc Get current logged-in user
+    // @route GET /api/users/current
+    // @access Private
     @GetMapping("/current")
-    public RegisterResponse getUser(@AuthenticationPrincipal UserDetails userDetails) {
-        var user = userService.findByEmail(userDetails.getUsername());
-        return userService.getUser(user);
-    }
-
-    @PostMapping()
-    public RegisterResponse createAdmin(@RequestBody  RegisterRequest registerRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<RegisterResponse> getUser(@AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
 
-        return userService.createAdmin(registerRequest, user);
+        return new ResponseEntity<>(userService.getUser(user), HttpStatus.OK);
     }
 
+    // @desc Create another admin
+    // @route POST /api/users
+    // @access Private/Admin
+    @PostMapping
+    public ResponseEntity<RegisterResponse> createAdmin(@RequestBody  RegisterRequest registerRequest, @AuthenticationPrincipal UserDetails userDetails) {
+        var user = userService.findByEmail(userDetails.getUsername());
+
+        return new ResponseEntity<>(userService.createAdmin(registerRequest, user), HttpStatus.CREATED);
+    }
+
+    // @desc Update current logged-in user
+    // @route PUT /api/users/current
+    // @access Private
     @PutMapping("/current")
-    public RegisterResponse updateUser(@RequestBody RegisterRequest registerRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<RegisterResponse> updateUser(@RequestBody RegisterRequest registerRequest, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
 
-        return userService.updateUser(registerRequest, user);
+        return new ResponseEntity<>(userService.updateUser(registerRequest, user), HttpStatus.OK);
     }
 
+    // @desc Forgot password
+    // @route PUT /api/users/forgot-password?email={email}
+    // @access Private
     @PutMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestParam String email) throws MessagingException {
         return new ResponseEntity<>(userService.forgotPassword(email), HttpStatus.OK);
     }
 
+    // @desc Change password
+    // @route PATCH /api/users/change-password
+    // @access Private
     @PatchMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
         userService.changePassword(request, user);
-        return ResponseEntity.ok().build();
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // @desc Reset password
+    // @route PUT /api/users/reset-password?email={email}
+    // @access Private
     @PutMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestHeader String newPassword) {
         return new ResponseEntity<>(userService.resetPassword(email, newPassword), HttpStatus.OK);
     }
 
+    // @desc Delete current logged-in user
+    // @route DELETE /api/users/current
+    // @access Private
     @DeleteMapping("/current")
     public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
-        var result =  userService.deleteUser(user);
+        userService.deleteUser(user);
 
-        if (result)
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

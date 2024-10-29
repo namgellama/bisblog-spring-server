@@ -5,6 +5,8 @@ import com.bisblog.bisblog.entities.Upvote;
 import com.bisblog.bisblog.services.UpvoteService;
 import com.bisblog.bisblog.services.UserService;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -24,18 +26,31 @@ public class UpvoteController {
         this.modelMapper = modelMapper;
     }
 
+    // @desc Create a post upvote
+    // @route POST /api/posts/{postId}/upvotes
+    // @access Private
     @PostMapping("/posts/{postId}/upvotes")
-    public UpvoteResponse createPostUpvote(@PathVariable UUID postId, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<UpvoteResponse> createPostUpvote(@PathVariable UUID postId, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
+        var result = upvoteService.upvotePost(postId, user);
 
-        return modelMapper.map(upvoteService.upvotePost(postId, user), UpvoteResponse.class);
+        if (result == null)
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+    // @desc Create a post upvote
+    // @route POST /api/posts/{postId}/upvotes
+    // @access Private
     @PostMapping("/comments/{commentId}/upvotes")
-    public UpvoteResponse createCommentUpvote(@PathVariable UUID commentId, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<UpvoteResponse> createCommentUpvote(@PathVariable UUID commentId, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
-        System.out.println(userDetails.getUsername());
+        var result = upvoteService.upvoteComment(commentId, user);
 
-        return modelMapper.map(upvoteService.upvoteComment(commentId, user), UpvoteResponse.class);
+        if (result == null)
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 }

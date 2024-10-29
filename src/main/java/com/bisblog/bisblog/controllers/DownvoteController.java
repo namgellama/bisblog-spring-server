@@ -4,6 +4,8 @@ import com.bisblog.bisblog.dtos.DownvoteResponse;
 import com.bisblog.bisblog.services.DownvoteService;
 import com.bisblog.bisblog.services.UserService;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,25 +20,37 @@ import java.util.UUID;
 public class DownvoteController {
     private final DownvoteService downvoteService;
     private final UserService userService;
-    private final ModelMapper modelMapper;
 
     public DownvoteController(DownvoteService downvoteService, UserService userService, ModelMapper modelMapper) {
         this.downvoteService = downvoteService;
         this.userService = userService;
-        this.modelMapper = modelMapper;
     }
 
+    // @desc Create a post downvote
+    // @route POST /api/posts/{postId}/downvotes
+    // @access Private
     @PostMapping("/posts/{postId}/downvotes")
-    public DownvoteResponse createPostDownvote(@PathVariable UUID postId, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<DownvoteResponse> createPostDownvote(@PathVariable UUID postId, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
+        var result = downvoteService.downvotePost(postId, user);
 
-        return modelMapper.map(downvoteService.downvotePost(postId, user), DownvoteResponse.class);
+        if (result == null)
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+    // @desc Create a comment downvote
+    // @route POST /api/comments/{commentId}/downvotes
+    // @access Private
     @PostMapping("/comments/{commentId}/downvotes")
-    public DownvoteResponse createCommentDownvote(@PathVariable UUID commentId, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<DownvoteResponse> createCommentDownvote(@PathVariable UUID commentId, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
+        var result = downvoteService.downvoteComment(commentId, user);
 
-        return modelMapper.map(downvoteService.downvoteComment(commentId, user), DownvoteResponse.class);
+        if (result == null)
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 }
