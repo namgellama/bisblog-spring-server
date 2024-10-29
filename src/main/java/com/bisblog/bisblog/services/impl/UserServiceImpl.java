@@ -5,6 +5,7 @@ import com.bisblog.bisblog.dtos.RegisterRequest;
 import com.bisblog.bisblog.dtos.RegisterResponse;
 import com.bisblog.bisblog.entities.User;
 import com.bisblog.bisblog.entities.enums.Role;
+import com.bisblog.bisblog.exceptions.ForbiddenException;
 import com.bisblog.bisblog.exceptions.UnauthorizedException;
 import com.bisblog.bisblog.exceptions.UserNotFoundException;
 import com.bisblog.bisblog.repositories.UserRepository;
@@ -45,6 +46,12 @@ public class UserServiceImpl implements UserService {
             throw new UnauthorizedException("Not authorized.");
         }
 
+        var existingUser = userRepository.findByEmail(registerRequest.getEmail());
+
+        if (existingUser.isPresent()) {
+            throw new ForbiddenException("User already exists.");
+        }
+
         var newAdmin = User.builder()
                 .firstName(registerRequest.getFirstName())
                 .lastName(registerRequest.getLastName())
@@ -70,6 +77,12 @@ public class UserServiceImpl implements UserService {
     public RegisterResponse updateUser(RegisterRequest registerRequest, User user) {
         var userEntity = userRepository.findById(user.getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+
+        var existingUser = userRepository.findByEmail(registerRequest.getEmail());
+
+        if (existingUser.isPresent() && existingUser.get().getId() != user.getId()) {
+            throw new ForbiddenException("User already exists.");
+        }
 
         userEntity.setFirstName(registerRequest.getFirstName());
         userEntity.setLastName(registerRequest.getLastName());

@@ -6,13 +6,13 @@ import com.bisblog.bisblog.dtos.LoginRequest;
 import com.bisblog.bisblog.dtos.RegisterRequest;
 import com.bisblog.bisblog.entities.User;
 import com.bisblog.bisblog.entities.enums.Role;
+import com.bisblog.bisblog.exceptions.ForbiddenException;
 import com.bisblog.bisblog.exceptions.UserNotFoundException;
 import com.bisblog.bisblog.repositories.UserRepository;
 import com.bisblog.bisblog.services.AuthService;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +34,11 @@ public class AuthServiceImpl implements AuthService {
     // Register a user
     @Override
     public RegisterResponse register(RegisterRequest request) {
+        var existingUser = userRepository.findByEmail(request.getEmail());
+
+        if (existingUser.isPresent())
+            throw new ForbiddenException("User already exists.");
+
         var userData = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
