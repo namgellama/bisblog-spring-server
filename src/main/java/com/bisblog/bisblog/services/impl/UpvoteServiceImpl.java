@@ -1,5 +1,6 @@
 package com.bisblog.bisblog.services.impl;
 
+import com.bisblog.bisblog.dtos.UpvoteResponse;
 import com.bisblog.bisblog.entities.Upvote;
 import com.bisblog.bisblog.entities.User;
 import com.bisblog.bisblog.exceptions.CommentNotFoundException;
@@ -9,6 +10,7 @@ import com.bisblog.bisblog.repositories.DownvoteRepository;
 import com.bisblog.bisblog.repositories.PostRepository;
 import com.bisblog.bisblog.repositories.UpvoteRepository;
 import com.bisblog.bisblog.services.UpvoteService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -19,16 +21,18 @@ public class UpvoteServiceImpl implements UpvoteService {
     private final DownvoteRepository downvoteRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final ModelMapper modelMapper;
 
-    public UpvoteServiceImpl(UpvoteRepository upvoteRepository, DownvoteRepository downvoteRepository, PostRepository postRepository, CommentRepository commentRepository) {
+    public UpvoteServiceImpl(UpvoteRepository upvoteRepository, DownvoteRepository downvoteRepository, PostRepository postRepository, CommentRepository commentRepository, ModelMapper modelMapper) {
         this.upvoteRepository = upvoteRepository;
         this.downvoteRepository = downvoteRepository;
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public Upvote upvotePost(UUID postId, User user) {
+    public UpvoteResponse upvotePost(UUID postId, User user) {
         var post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found."));
         var existingUpvote = upvoteRepository.findByPostIdAndUserId(postId, user.getId());
@@ -48,16 +52,16 @@ public class UpvoteServiceImpl implements UpvoteService {
                 .user(user)
                 .build();
 
-        return upvoteRepository.save(newUpvote);
+        return modelMapper.map(upvoteRepository.save(newUpvote), UpvoteResponse.class);
     }
 
     @Override
-    public Upvote upvoteComment(UUID commentId, User user) {
+    public UpvoteResponse upvoteComment(UUID commentId, User user) {
         var comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("Comment not found."));
         var existingUpvote = upvoteRepository.findByCommentIdAndUserId(commentId, user.getId());
         var existingDownvote = downvoteRepository.findByCommentIdAndUserId(commentId, user.getId());
-        System.out.println(comment);
+
         if (existingUpvote != null) {
             upvoteRepository.deleteById(existingUpvote.getId());
             return null;
@@ -72,6 +76,6 @@ public class UpvoteServiceImpl implements UpvoteService {
                 .user(user)
                 .build();
 
-        return upvoteRepository.save(newUpvote);
+        return modelMapper.map(upvoteRepository.save(newUpvote), UpvoteResponse.class);
     }
 }
