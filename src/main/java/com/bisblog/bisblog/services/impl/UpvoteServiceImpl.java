@@ -31,6 +31,7 @@ public class UpvoteServiceImpl implements UpvoteService {
         this.modelMapper = modelMapper;
     }
 
+    // Create a post upvote
     @Override
     public UpvoteResponse upvotePost(UUID postId, User user) {
         var post = postRepository.findById(postId)
@@ -55,6 +56,7 @@ public class UpvoteServiceImpl implements UpvoteService {
         return modelMapper.map(upvoteRepository.save(newUpvote), UpvoteResponse.class);
     }
 
+    // Create a comment upvote
     @Override
     public UpvoteResponse upvoteComment(UUID commentId, User user) {
         var comment = commentRepository.findById(commentId)

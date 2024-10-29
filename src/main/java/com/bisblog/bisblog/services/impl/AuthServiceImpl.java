@@ -6,11 +6,13 @@ import com.bisblog.bisblog.dtos.LoginRequest;
 import com.bisblog.bisblog.dtos.RegisterRequest;
 import com.bisblog.bisblog.entities.User;
 import com.bisblog.bisblog.entities.enums.Role;
+import com.bisblog.bisblog.exceptions.UserNotFoundException;
 import com.bisblog.bisblog.repositories.UserRepository;
 import com.bisblog.bisblog.services.AuthService;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,7 @@ public class AuthServiceImpl implements AuthService {
         this.modelMapper = modelMapper;
     }
 
+    // Register a user
     @Override
     public RegisterResponse register(RegisterRequest request) {
         var userData = User.builder()
@@ -43,15 +46,17 @@ public class AuthServiceImpl implements AuthService {
         return modelMapper.map(user, RegisterResponse.class);
     }
 
+    // Login a user
     @Override
     public String login(LoginRequest request) {
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
                 request.getPassword())
         );
 
-        var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow();
+
         return jwtService.generateToken(user);
     }
 }

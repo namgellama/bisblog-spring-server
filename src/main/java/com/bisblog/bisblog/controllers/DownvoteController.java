@@ -27,7 +27,7 @@ public class DownvoteController {
     }
 
     // @desc Create a post downvote
-    // @route GET /api/posts/{postId}/downvotes
+    // @route POST /api/posts/{postId}/downvotes
     // @access Private
     @PostMapping("/posts/{postId}/downvotes")
     public ResponseEntity<DownvoteResponse> createPostDownvote(@PathVariable UUID postId, @AuthenticationPrincipal UserDetails userDetails) {
@@ -41,7 +41,7 @@ public class DownvoteController {
     }
 
     // @desc Create a comment downvote
-    // @route GET /api/comments/{commentId}/downvotes
+    // @route POST /api/comments/{commentId}/downvotes
     // @access Private
     @PostMapping("/comments/{commentId}/downvotes")
     public ResponseEntity<DownvoteResponse> createCommentDownvote(@PathVariable UUID commentId, @AuthenticationPrincipal UserDetails userDetails) {

@@ -20,11 +20,17 @@ public class AuthController {
         this.authService = authService;
     }
 
+    // @desc Register a user
+    // @route POST /api/auth/register
+    // @access Public
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
         return new ResponseEntity<>(authService.register(request), HttpStatus.CREATED);
     }
 
+    // @desc Login a user
+    // @route POST /api/auth/login
+    // @access Public
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest request) {
         return new ResponseEntity<>(authService.login(request), HttpStatus.OK);

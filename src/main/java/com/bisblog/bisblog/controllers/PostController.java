@@ -25,11 +25,17 @@ public class PostController {
         this.userService = userService;
     }
 
+    // @desc Get all posts
+    // @route GET /api/posts
+    // @access Public
     @GetMapping
     public ResponseEntity<List<PostResponse>> getAllPosts() {
         return new ResponseEntity<>(postService.getAllPosts(), HttpStatus.OK);
     }
 
+    // @desc Get a single post
+    // @route GET /api/posts/{id}
+    // @access Public
     @GetMapping("/{id}")
     public ResponseEntity<PostResponse> getPostById(@PathVariable UUID id) {
         var post = postService.getPostById(id);
@@ -38,6 +44,9 @@ public class PostController {
 
     }
 
+    // @desc Create a post
+    // @route POST /api/posts
+    // @access Private
     @PostMapping
     public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest post, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());
@@ -45,6 +54,9 @@ public class PostController {
         return new ResponseEntity<>(newPost, HttpStatus.CREATED);
     }
 
+    // @desc Update a post
+    // @route PUT /api/posts/{id}
+    // @access Private
     @PutMapping("/{id}")
     public ResponseEntity<PostResponse> updatePost(@PathVariable UUID id, @RequestBody PostRequest post, @AuthenticationPrincipal UserDetails userDetails) {
         var existingPost = postService.getPostById(id);
@@ -57,6 +69,9 @@ public class PostController {
         return new ResponseEntity<>(updatedPost, HttpStatus.OK);
     }
 
+    // @desc Delete a post
+    // @route DELETE /api/posts/{id}
+    // @access Private
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());

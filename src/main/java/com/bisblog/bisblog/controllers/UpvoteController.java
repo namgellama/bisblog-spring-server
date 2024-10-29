@@ -27,7 +27,7 @@ public class UpvoteController {
     }
 
     // @desc Create a post upvote
-    // @route GET /api/posts/{postId}/upvotes
+    // @route POST /api/posts/{postId}/upvotes
     // @access Private
     @PostMapping("/posts/{postId}/upvotes")
     public ResponseEntity<UpvoteResponse> createPostUpvote(@PathVariable UUID postId, @AuthenticationPrincipal UserDetails userDetails) {
@@ -40,6 +40,9 @@ public class UpvoteController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+    // @desc Create a post upvote
+    // @route POST /api/posts/{postId}/upvotes
+    // @access Private
     @PostMapping("/comments/{commentId}/upvotes")
     public ResponseEntity<UpvoteResponse> createCommentUpvote(@PathVariable UUID commentId, @AuthenticationPrincipal UserDetails userDetails) {
         var user = userService.findByEmail(userDetails.getUsername());

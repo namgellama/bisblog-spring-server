@@ -5,10 +5,8 @@ import com.bisblog.bisblog.dtos.RegisterRequest;
 import com.bisblog.bisblog.dtos.RegisterResponse;
 import com.bisblog.bisblog.entities.User;
 import jakarta.mail.MessagingException;
-import org.springframework.http.ResponseEntity;
 
-import java.security.Principal;
-import java.util.UUID;
+import java.util.Optional;
 
 public interface UserService {
     User findByEmail(String email);
@@ -17,7 +15,7 @@ public interface UserService {
 
     RegisterResponse updateUser(RegisterRequest registerRequest, User user);
 
-    boolean deleteUser(User user);
+    void deleteUser(User user);
 
     void changePassword(ChangePasswordRequest request, User user);
 

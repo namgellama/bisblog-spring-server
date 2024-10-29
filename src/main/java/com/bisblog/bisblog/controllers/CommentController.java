@@ -35,7 +35,7 @@ public class CommentController {
     }
 
     // @desc Create a comment
-    // @route GET /api/posts/{postId}/comments
+    // @route POST /api/posts/{postId}/comments
     // @access Private
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentResponse> createComment(@PathVariable UUID postId, @RequestBody CommentRequest comment, @AuthenticationPrincipal UserDetails userDetails) {
@@ -53,7 +53,7 @@ public class CommentController {
     }
 
     // @desc Create a reply of a comment
-    // @route GET /api/comments/{commentId}/replies
+    // @route POST /api/comments/{commentId}/replies
     // @access Private
     @PostMapping("/comments/{commentId}/replies")
     public ResponseEntity<CommentResponse> createCommentReply(@PathVariable UUID commentId, @RequestBody CommentRequest comment, @AuthenticationPrincipal UserDetails userDetails) {
@@ -63,7 +63,7 @@ public class CommentController {
     }
 
     // @desc Update a comment
-    // @route GET /api/comments/{commentId}
+    // @route PUT /api/comments/{commentId}
     // @access Private
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(@PathVariable UUID commentId, @RequestBody CommentRequest comment, @AuthenticationPrincipal UserDetails userDetails) {
@@ -74,7 +74,7 @@ public class CommentController {
     }
 
     // @desc Delete a comment
-    // @route GET /api/comments/{commentId}
+    // @route DELETE /api/comments/{commentId}
     // @access Private
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable UUID commentId, @AuthenticationPrincipal UserDetails userDetails) {
